@@ -1,11 +1,17 @@
 const apiKeyInput = document.querySelector("#api-key");
 const connectButton = document.querySelector("#connect-button");
 const statusElement = document.querySelector("#status");
+const finderSection = document.querySelector("#finder-section");
+
+let activeApiKey = null;
 
 connectButton.addEventListener("click", connectToTorn);
 
 async function connectToTorn() {
     const apiKey = apiKeyInput.value.trim();
+
+    activeApiKey = null;
+    finderSection.hidden = true;
 
     if (apiKey.length !== 16) {
         statusElement.textContent =
@@ -15,6 +21,7 @@ async function connectToTorn() {
     }
 
     statusElement.textContent = "Connecting to Torn...";
+    connectButton.disabled = true;
 
     try {
         const response = await fetch(
@@ -30,18 +37,32 @@ async function connectToTorn() {
 
         console.log(data);
 
-        if (!response.ok) {
+        if (!response.ok || data.error) {
             throw new Error(
                 data.error?.error ?? "Torn rejected the API key."
             );
         }
 
+        const accessType = data.info?.access?.type;
+
+        if (!accessType) {
+            throw new Error("Torn returned an unexpected response.");
+        }
+
+        activeApiKey = apiKey;
+        finderSection.hidden = false;
+
         statusElement.textContent =
-            `Connected successfully. Access: ${data.info.access.type}.`;
+            `Connected successfully. Access: ${accessType}.`;
     } catch (error) {
         console.error(error);
 
+        activeApiKey = null;
+        finderSection.hidden = true;
+
         statusElement.textContent =
             `Connection failed: ${error.message}`;
+    } finally {
+        connectButton.disabled = false;
     }
 }
