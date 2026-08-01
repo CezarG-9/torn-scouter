@@ -44,3 +44,12 @@ h1 {
 .perk-locked {
     opacity: 0.45;
 }
+
+#search-button {
+    display: block;
+    margin-top: 16px;
+}
+
+#results-section {
+    margin-top: 24px;
+}
