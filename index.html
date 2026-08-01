@@ -12,7 +12,27 @@
 
 <main>
     <h1>Torn Scouter</h1>
-    <p id="status">Loading project...</p>
+    <p>Find Torn companies with available employee slots.</p>
+
+    <section id="api-section">
+        <h2>Connect to Torn</h2>
+
+        <label for="api-key">Public API key</label>
+
+        <input
+                type="password"
+                id="api-key"
+                maxlength="16"
+                autocomplete="off"
+                placeholder="Enter your 16-character API key"
+        >
+
+        <button type="button" id="connect-button">
+            Connect
+        </button>
+
+        <p id="status"></p>
+    </section>
 </main>
 
 <script src="js/app.js"></script>
