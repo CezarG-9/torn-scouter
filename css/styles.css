@@ -36,3 +36,11 @@ h1 {
 .perk-card p {
     margin: 6px 0;
 }
+
+.perk-unlocked {
+    border-color: #63b36b;
+}
+
+.perk-locked {
+    opacity: 0.45;
+}

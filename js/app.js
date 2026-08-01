@@ -13,6 +13,8 @@ const perksTitle =
     document.querySelector("#perks-title");
 const perksList =
     document.querySelector("#perks-list");
+const minimumStarsSelect =
+    document.querySelector("#minimum-stars");
 
 let activeApiKey = null;
 let companyDefinitions = {};
@@ -20,6 +22,8 @@ let companyDefinitions = {};
 connectButton.addEventListener("click", connectToTorn);
 
 companyTypeSelect.addEventListener("change", displaySelectedCompanyPerks);
+
+minimumStarsSelect.addEventListener("change", updatePerkAvailability);
 
 async function loadCompanyTypes(apiKey) {
     finderStatusElement.textContent =
@@ -159,6 +163,9 @@ function displaySelectedCompanyPerks() {
     perksSection.hidden = true;
     perksList.replaceChildren();
 
+    minimumStarsSelect.value = "";
+    minimumStarsSelect.disabled = true;
+
     if (!selectedCompanyTypeId) {
         return;
     }
@@ -172,6 +179,8 @@ function displaySelectedCompanyPerks() {
 
         return;
     }
+
+    minimumStarsSelect.disabled = false;
 
     const specials =
         Object.entries(selectedCompany.specials ?? {});
@@ -202,6 +211,9 @@ function displaySelectedCompanyPerks() {
             document.createElement("article");
 
         perkCard.classList.add("perk-card");
+
+        perkCard.dataset.ratingRequired =
+            special.rating_required;
 
         const perkName =
             document.createElement("h4");
@@ -241,4 +253,32 @@ function displaySelectedCompanyPerks() {
     }
 
     perksSection.hidden = false;
+}
+
+function updatePerkAvailability() {
+    const selectedMinimumStars =
+        Number(minimumStarsSelect.value);
+
+    const perkCards =
+        perksList.querySelectorAll(".perk-card");
+
+    for (const perkCard of perkCards) {
+        perkCard.classList.remove(
+            "perk-unlocked",
+            "perk-locked"
+        );
+
+        if (!selectedMinimumStars) {
+            continue;
+        }
+
+        const requiredStars =
+            Number(perkCard.dataset.ratingRequired);
+
+        if (requiredStars <= selectedMinimumStars) {
+            perkCard.classList.add("perk-unlocked");
+        } else {
+            perkCard.classList.add("perk-locked");
+        }
+    }
 }
