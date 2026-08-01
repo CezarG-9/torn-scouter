@@ -5,15 +5,21 @@ const finderSection = document.querySelector("#finder-section");
 
 const companyTypeSelect =
     document.querySelector("#company-type");
-
 const finderStatusElement =
     document.querySelector("#finder-status");
+const perksSection =
+    document.querySelector("#perks-section");
+const perksTitle =
+    document.querySelector("#perks-title");
+const perksList =
+    document.querySelector("#perks-list");
 
 let activeApiKey = null;
-
 let companyDefinitions = {};
 
 connectButton.addEventListener("click", connectToTorn);
+
+companyTypeSelect.addEventListener("change", displaySelectedCompanyPerks);
 
 async function loadCompanyTypes(apiKey) {
     finderStatusElement.textContent =
@@ -144,4 +150,95 @@ async function connectToTorn() {
     } finally {
         connectButton.disabled = false;
     }
+}
+
+function displaySelectedCompanyPerks() {
+    const selectedCompanyTypeId =
+        companyTypeSelect.value;
+
+    perksSection.hidden = true;
+    perksList.replaceChildren();
+
+    if (!selectedCompanyTypeId) {
+        return;
+    }
+
+    const selectedCompany =
+        companyDefinitions[selectedCompanyTypeId];
+
+    if (!selectedCompany) {
+        finderStatusElement.textContent =
+            "The selected company type could not be found.";
+
+        return;
+    }
+
+    const specials =
+        Object.entries(selectedCompany.specials ?? {});
+
+    specials.sort((firstSpecial, secondSpecial) => {
+        return firstSpecial[1].rating_required
+            - secondSpecial[1].rating_required;
+    });
+
+    perksTitle.textContent =
+        `${selectedCompany.name} perks`;
+
+    if (specials.length === 0) {
+        const emptyMessage =
+            document.createElement("p");
+
+        emptyMessage.textContent =
+            "No perks were returned for this company type.";
+
+        perksList.append(emptyMessage);
+        perksSection.hidden = false;
+
+        return;
+    }
+
+    for (const [specialName, special] of specials) {
+        const perkCard =
+            document.createElement("article");
+
+        perkCard.classList.add("perk-card");
+
+        const perkName =
+            document.createElement("h4");
+
+        perkName.textContent =
+            `${special.rating_required}★ — ${specialName}`;
+
+        const perkEffect =
+            document.createElement("p");
+
+        perkEffect.textContent =
+            special.effect;
+
+        const perkCost =
+            document.createElement("p");
+
+        if (special.cost === 0) {
+            perkCost.textContent =
+                "Cost: Passive perk";
+        } else {
+            const pointWord =
+                special.cost === 1
+                    ? "job point"
+                    : "job points";
+
+            perkCost.textContent =
+                `Cost: ${special.cost} ${pointWord}`;
+        }
+
+        perkCard.append(
+            perkName,
+            perkEffect,
+            perkCost
+        );
+
+        perksList.append(perkCard);
+    }
+
+    perksSection.hidden = false;
 }

@@ -14,3 +14,25 @@ main {
 h1 {
     margin-bottom: 8px;
 }
+
+#perks-list {
+    display: grid;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.perk-card {
+    padding: 16px;
+    border: 1px solid #555;
+    border-radius: 6px;
+    background-color: #292a2d;
+}
+
+.perk-card h4 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.perk-card p {
+    margin: 6px 0;
+}
