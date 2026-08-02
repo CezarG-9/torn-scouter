@@ -1,7 +1,14 @@
-const apiKeyInput = document.querySelector("#api-key");
-const connectButton = document.querySelector("#connect-button");
-const statusElement = document.querySelector("#status");
-const finderSection = document.querySelector("#finder-section");
+const apiKeyInput =
+    document.querySelector("#api-key");
+
+const connectButton =
+    document.querySelector("#connect-button");
+
+const statusElement =
+    document.querySelector("#status");
+
+const finderSection =
+    document.querySelector("#finder-section");
 
 const companyTypeSelect =
     document.querySelector("#company-type");
@@ -33,8 +40,10 @@ const resultsStatusElement =
 const resultsList =
     document.querySelector("#results-list");
 
+
 let activeApiKey = null;
 let companyDefinitions = {};
+
 
 connectButton.addEventListener(
     "click",
@@ -51,8 +60,15 @@ minimumStarsSelect.addEventListener(
     handleMinimumStarsChange
 );
 
+searchButton.addEventListener(
+    "click",
+    searchForVacancies
+);
+
+
 async function connectToTorn() {
-    const apiKey = apiKeyInput.value.trim();
+    const apiKey =
+        apiKeyInput.value.trim();
 
     activeApiKey = null;
     finderSection.hidden = true;
@@ -81,12 +97,13 @@ async function connectToTorn() {
             }
         );
 
-        const data = await response.json();
+        const data =
+            await response.json();
 
         if (!response.ok || data.error) {
             throw new Error(
-                data.error?.error ??
-                "Torn rejected the API key."
+                data.error?.error
+                ?? "Torn rejected the API key."
             );
         }
 
@@ -122,6 +139,7 @@ async function connectToTorn() {
     }
 }
 
+
 async function loadCompanyTypes(apiKey) {
     finderStatusElement.textContent =
         "Loading company types...";
@@ -135,12 +153,13 @@ async function loadCompanyTypes(apiKey) {
         }
     );
 
-    const data = await response.json();
+    const data =
+        await response.json();
 
     if (!response.ok || data.error) {
         throw new Error(
-            data.error?.error ??
-            "Could not load Torn company information."
+            data.error?.error
+            ?? "Could not load Torn company information."
         );
     }
 
@@ -150,7 +169,8 @@ async function loadCompanyTypes(apiKey) {
         );
     }
 
-    companyDefinitions = data.companies;
+    companyDefinitions =
+        data.companies;
 
     populateCompanyTypeSelect();
 
@@ -161,13 +181,11 @@ async function loadCompanyTypes(apiKey) {
         `${companyTypeCount} company types loaded.`;
 }
 
+
 function populateCompanyTypeSelect() {
-    companyTypeSelect.replaceChildren();
-
-    const placeholderOption =
-        createCompanyPlaceholderOption();
-
-    companyTypeSelect.append(placeholderOption);
+    companyTypeSelect.replaceChildren(
+        createCompanyPlaceholderOption()
+    );
 
     const companyTypes =
         Object.entries(companyDefinitions);
@@ -180,7 +198,9 @@ function populateCompanyTypeSelect() {
             const secondName =
                 secondCompany[1].name;
 
-            return firstName.localeCompare(secondName);
+            return firstName.localeCompare(
+                secondName
+            );
         }
     );
 
@@ -191,23 +211,29 @@ function populateCompanyTypeSelect() {
         const option =
             document.createElement("option");
 
-        option.value = companyTypeId;
-        option.textContent = companyType.name;
+        option.value =
+            companyTypeId;
+
+        option.textContent =
+            companyType.name;
 
         companyTypeSelect.append(option);
     }
 }
+
 
 function createCompanyPlaceholderOption() {
     const placeholderOption =
         document.createElement("option");
 
     placeholderOption.value = "";
+
     placeholderOption.textContent =
         "Select a company type";
 
     return placeholderOption;
 }
+
 
 function handleCompanyTypeChange() {
     displaySelectedCompanyPerks();
@@ -215,11 +241,13 @@ function handleCompanyTypeChange() {
     updateSearchButtonState();
 }
 
+
 function handleMinimumStarsChange() {
     updatePerkAvailability();
     resetSearchResults();
     updateSearchButtonState();
 }
+
 
 function displaySelectedCompanyPerks() {
     const selectedCompanyTypeId =
@@ -282,7 +310,9 @@ function displaySelectedCompanyPerks() {
         const perkCard =
             document.createElement("article");
 
-        perkCard.classList.add("perk-card");
+        perkCard.classList.add(
+            "perk-card"
+        );
 
         perkCard.dataset.ratingRequired =
             special.rating_required;
@@ -327,12 +357,15 @@ function displaySelectedCompanyPerks() {
     perksSection.hidden = false;
 }
 
+
 function updatePerkAvailability() {
     const selectedMinimumStars =
         Number(minimumStarsSelect.value);
 
     const perkCards =
-        perksList.querySelectorAll(".perk-card");
+        perksList.querySelectorAll(
+            ".perk-card"
+        );
 
     for (const perkCard of perkCards) {
         perkCard.classList.remove(
@@ -364,6 +397,7 @@ function updatePerkAvailability() {
     }
 }
 
+
 function updateSearchButtonState() {
     const hasApiKey =
         Boolean(activeApiKey);
@@ -381,12 +415,368 @@ function updateSearchButtonState() {
     );
 }
 
+
+async function searchForVacancies() {
+    const companyTypeId =
+        companyTypeSelect.value;
+
+    const minimumStars =
+        Number(minimumStarsSelect.value);
+
+    if (
+        !activeApiKey
+        || !companyTypeId
+        || !minimumStars
+    ) {
+        updateSearchButtonState();
+        return;
+    }
+
+    resetSearchResults();
+
+    resultsSection.hidden = false;
+
+    resultsStatusElement.textContent =
+        "Loading companies...";
+
+    searchButton.disabled = true;
+    companyTypeSelect.disabled = true;
+    minimumStarsSelect.disabled = true;
+
+    try {
+        const allCompanies =
+            await loadAllCompanies(
+                companyTypeId,
+                activeApiKey
+            );
+
+        const matchingCompanies =
+            findCompaniesWithVacancies(
+                allCompanies,
+                minimumStars
+            );
+
+        displayVacancyResults(
+            matchingCompanies,
+            allCompanies.length
+        );
+    } catch (error) {
+        console.error(error);
+
+        resultsStatusElement.textContent =
+            `Search failed: ${error.message}`;
+    } finally {
+        companyTypeSelect.disabled = false;
+        minimumStarsSelect.disabled = false;
+
+        updateSearchButtonState();
+    }
+}
+
+
+async function loadAllCompanies(
+    companyTypeId,
+    apiKey
+) {
+    const pageSize = 100;
+    const maximumPages = 100;
+
+    let offset = 0;
+    let totalCompanies = null;
+    let loadedPages = 0;
+
+    const allCompanies = [];
+
+    while (loadedPages < maximumPages) {
+        const requestUrl = new URL(
+            `https://api.torn.com/v2/company/${companyTypeId}/companies`
+        );
+
+        requestUrl.searchParams.set(
+            "limit",
+            pageSize
+        );
+
+        requestUrl.searchParams.set(
+            "offset",
+            offset
+        );
+
+        const response = await fetch(
+            requestUrl,
+            {
+                headers: {
+                    Authorization: `ApiKey ${apiKey}`
+                }
+            }
+        );
+
+        const data =
+            await response.json();
+
+        if (!response.ok || data.error) {
+            throw new Error(
+                data.error?.error
+                ?? "Could not load company vacancies."
+            );
+        }
+
+        if (!Array.isArray(data.companies)) {
+            throw new Error(
+                "Torn returned an unexpected company response."
+            );
+        }
+
+        const currentPage =
+            data.companies;
+
+        allCompanies.push(
+            ...currentPage
+        );
+
+        loadedPages += 1;
+
+        const metadataTotal =
+            Number(data._metadata?.total);
+
+        if (
+            totalCompanies === null
+            && Number.isFinite(metadataTotal)
+        ) {
+            totalCompanies =
+                metadataTotal;
+        }
+
+        if (totalCompanies !== null) {
+            const loadedCount =
+                Math.min(
+                    allCompanies.length,
+                    totalCompanies
+                );
+
+            resultsStatusElement.textContent =
+                `Loading companies: ${loadedCount} of ${totalCompanies}...`;
+        } else {
+            resultsStatusElement.textContent =
+                `Loading companies: ${allCompanies.length} loaded...`;
+        }
+
+        const reachedLastPage =
+            currentPage.length < pageSize;
+
+        const reachedKnownTotal =
+            totalCompanies !== null
+            && allCompanies.length
+            >= totalCompanies;
+
+        if (
+            currentPage.length === 0
+            || reachedLastPage
+            || reachedKnownTotal
+        ) {
+            return allCompanies;
+        }
+
+        offset += pageSize;
+    }
+
+    throw new Error(
+        "Company search stopped because too many pages were returned."
+    );
+}
+
+
+function findCompaniesWithVacancies(
+    companies,
+    minimumStars
+) {
+    return companies
+        .map((company) => {
+            const employeesHired =
+                Number(
+                    company.employees?.hired
+                    ?? 0
+                );
+
+            const employeeCapacity =
+                Number(
+                    company.employees?.capacity
+                    ?? 0
+                );
+
+            const rating =
+                Number(company.rating ?? 0);
+
+            const vacancies =
+                employeeCapacity
+                - employeesHired;
+
+            return {
+                ...company,
+                rating,
+                employeesHired,
+                employeeCapacity,
+                vacancies
+            };
+        })
+        .filter((company) => {
+            return company.rating
+                >= minimumStars
+                && company.vacancies > 0;
+        })
+        .sort(
+            (firstCompany, secondCompany) => {
+                const ratingDifference =
+                    secondCompany.rating
+                    - firstCompany.rating;
+
+                if (ratingDifference !== 0) {
+                    return ratingDifference;
+                }
+
+                const vacancyDifference =
+                    secondCompany.vacancies
+                    - firstCompany.vacancies;
+
+                if (vacancyDifference !== 0) {
+                    return vacancyDifference;
+                }
+
+                return firstCompany.name.localeCompare(
+                    secondCompany.name
+                );
+            }
+        );
+}
+
+
+function displayVacancyResults(
+    companies,
+    totalCompaniesScanned
+) {
+    resultsList.replaceChildren();
+
+    if (companies.length === 0) {
+        resultsStatusElement.textContent =
+            `No matching vacancies found among ${totalCompaniesScanned} companies.`;
+
+        return;
+    }
+
+    const companyWord =
+        companies.length === 1
+            ? "company"
+            : "companies";
+
+    resultsStatusElement.textContent =
+        `${companies.length} matching ${companyWord} found from ${totalCompaniesScanned} scanned.`;
+
+    for (const company of companies) {
+        const resultCard =
+            document.createElement("article");
+
+        resultCard.classList.add(
+            "result-card"
+        );
+
+        const companyName =
+            document.createElement("h4");
+
+        companyName.textContent =
+            `${company.rating}★ — ${company.name}`;
+
+        const employeeCount =
+            document.createElement("p");
+
+        employeeCount.textContent =
+            `Employees: ${company.employeesHired} / ${company.employeeCapacity}`;
+
+        const vacancyCount =
+            document.createElement("p");
+
+        const vacancyWord =
+            company.vacancies === 1
+                ? "vacancy"
+                : "vacancies";
+
+        vacancyCount.textContent =
+            `${company.vacancies} ${vacancyWord}`;
+
+        const applicationStatus =
+            document.createElement("p");
+
+        if (
+            company.applications_allowed
+            === true
+        ) {
+            applicationStatus.textContent =
+                "Applications: Allowed";
+        } else if (
+            company.applications_allowed
+            === false
+        ) {
+            applicationStatus.textContent =
+                "Applications: Currently closed";
+
+            applicationStatus.classList.add(
+                "applications-closed"
+            );
+        } else {
+            applicationStatus.textContent =
+                "Applications: Status unavailable";
+        }
+
+        const directorInformation =
+            document.createElement("p");
+
+        const directorName =
+            company.director?.name
+            ?? "Unknown";
+
+        const directorActivity =
+            company.director
+                ?.last_action
+                ?.relative
+            ?? "Unknown";
+
+        directorInformation.textContent =
+            `Director: ${directorName} — last active ${directorActivity}`;
+
+        const companyLink =
+            document.createElement("a");
+
+        companyLink.href =
+            `https://www.torn.com/joblist.php#/p=corpinfo&ID=${encodeURIComponent(company.id)}`;
+
+        companyLink.target = "_blank";
+        companyLink.rel = "noopener noreferrer";
+        companyLink.textContent =
+            "View company in Torn";
+
+        companyLink.classList.add(
+            "company-link"
+        );
+
+        resultCard.append(
+            companyName,
+            employeeCount,
+            vacancyCount,
+            applicationStatus,
+            directorInformation,
+            companyLink
+        );
+
+        resultsList.append(resultCard);
+    }
+}
 function resetFinderInterface() {
     companyDefinitions = {};
 
     companyTypeSelect.replaceChildren(
         createCompanyPlaceholderOption()
     );
+
+    companyTypeSelect.disabled = false;
 
     minimumStarsSelect.value = "";
     minimumStarsSelect.disabled = true;
@@ -396,11 +786,14 @@ function resetFinderInterface() {
     finderStatusElement.textContent = "";
 
     perksSection.hidden = true;
-    perksTitle.textContent = "Company perks";
+    perksTitle.textContent =
+        "Company perks";
+
     perksList.replaceChildren();
 
     resetSearchResults();
 }
+
 
 function resetSearchResults() {
     resultsSection.hidden = true;
