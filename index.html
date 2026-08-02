@@ -2,90 +2,332 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+            name="description"
+            content="Find Torn companies with available employee slots and explore their perks."
+    >
+
+    <meta
+            name="theme-color"
+            content="#0b0e13"
+    >
 
     <title>Torn Scouter</title>
 
-    <link rel="stylesheet" href="css/styles.css">
+    <link
+            rel="stylesheet"
+            href="css/styles.css"
+    >
 </head>
+
 <body>
 
-<main>
-    <h1>Torn Scouter</h1>
-    <p>Find Torn companies with available employee slots.</p>
+<div class="page-shell">
 
-    <section id="api-section">
-        <h2>Connect to Torn</h2>
+    <header class="site-header">
+        <div class="brand">
+            <div class="brand-mark">TS</div>
 
-        <label for="api-key">Public API key</label>
+            <div class="brand-text">
+                <span class="brand-name">Torn Scouter</span>
+                <span class="brand-label">Company vacancy finder</span>
+            </div>
+        </div>
 
-        <input
-                type="password"
-                id="api-key"
-                maxlength="16"
-                autocomplete="off"
-                placeholder="Enter your 16-character API key"
-        >
+        <span class="community-badge">
+            Unofficial community tool
+        </span>
+    </header>
 
-        <button type="button" id="connect-button">
-            Connect
-        </button>
+    <main class="main-content">
 
-        <p id="status"></p>
-    </section>
+        <section class="hero-section">
+            <div class="hero-copy">
+                <span class="eyebrow">Find your next company</span>
 
-    <section id="finder-section" hidden>
-        <h2>Company Search</h2>
+                <h1>Scout open company positions across Torn.</h1>
 
-        <label for="company-type">Company type</label>
+                <p>
+                    Explore company perks, choose your minimum star rating
+                    and find companies that currently have employee space.
+                </p>
+            </div>
 
-        <select id="company-type">
-            <option value="">Select a company type</option>
-        </select>
+            <div class="hero-feature-list">
+                <div class="hero-feature">
+                    <span class="feature-icon">01</span>
 
-        <label for="minimum-stars">Minimum company stars</label>
+                    <div>
+                        <strong>Live Torn data</strong>
+                        <span>Company information is loaded directly from the Torn API.</span>
+                    </div>
+                </div>
 
-        <select id="minimum-stars" disabled>
-            <option value="">Select minimum stars</option>
-            <option value="1">1★</option>
-            <option value="2">2★</option>
-            <option value="3">3★</option>
-            <option value="4">4★</option>
-            <option value="5">5★</option>
-            <option value="6">6★</option>
-            <option value="7">7★</option>
-            <option value="8">8★</option>
-            <option value="9">9★</option>
-            <option value="10">10★</option>
-        </select>
+                <div class="hero-feature">
+                    <span class="feature-icon">02</span>
 
-        <button
-                type="button"
-                id="search-button"
-                disabled
-        >
-            Look for vacancies
-        </button>
+                    <div>
+                        <strong>Full vacancy search</strong>
+                        <span>Every page is checked, not only the first 100 companies.</span>
+                    </div>
+                </div>
 
-        <p id="finder-status"></p>
+                <div class="hero-feature">
+                    <span class="feature-icon">03</span>
 
-        <section id="perks-section" hidden>
-            <h3 id="perks-title">Company perks</h3>
-
-            <div id="perks-list"></div>
+                    <div>
+                        <strong>Free to use</strong>
+                        <span>No registration, subscription or database required.</span>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <section id="results-section" hidden>
-            <h3>Available companies</h3>
+        <section
+                id="api-section"
+                class="panel connect-panel"
+        >
+            <div class="section-heading">
+                <div>
+                    <span class="step-label">Step 1</span>
+                    <h2>Connect to Torn</h2>
+                </div>
 
-            <p id="results-status"></p>
+                <span class="section-note">
+                    Public Only API key
+                </span>
+            </div>
 
-            <div id="results-list"></div>
+            <p class="section-description">
+                Your API key validates access and allows Torn Scouter to
+                retrieve public company information.
+            </p>
+
+            <div class="connection-form">
+                <div class="form-field api-field">
+                    <label for="api-key">
+                        Torn API key
+                    </label>
+
+                    <input
+                            type="password"
+                            id="api-key"
+                            maxlength="16"
+                            autocomplete="off"
+                            spellcheck="false"
+                            placeholder="Enter your 16-character API key"
+                    >
+
+                    <p class="field-hint">
+                        The key is used inside your browser and is not saved
+                        by Torn Scouter.
+                    </p>
+                </div>
+
+                <button
+                        type="button"
+                        id="connect-button"
+                        class="primary-button connect-button"
+                >
+                    Connect
+                </button>
+            </div>
+
+            <p
+                    id="status"
+                    class="status-message"
+                    aria-live="polite"
+            ></p>
         </section>
 
-    </section>
-</main>
+        <section
+                id="finder-section"
+                class="panel finder-panel"
+                hidden
+        >
+            <div class="section-heading">
+                <div>
+                    <span class="step-label">Step 2</span>
+                    <h2>Company Search</h2>
+                </div>
+
+                <span class="section-note">
+                    Choose your requirements
+                </span>
+            </div>
+
+            <div class="search-controls">
+                <div class="form-field">
+                    <label for="company-type">
+                        Company type
+                    </label>
+
+                    <select id="company-type">
+                        <option value="">
+                            Select a company type
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="minimum-stars">
+                        Minimum company stars
+                    </label>
+
+                    <select
+                            id="minimum-stars"
+                            disabled
+                    >
+                        <option value="">Select minimum stars</option>
+                        <option value="1">1★</option>
+                        <option value="2">2★</option>
+                        <option value="3">3★</option>
+                        <option value="4">4★</option>
+                        <option value="5">5★</option>
+                        <option value="6">6★</option>
+                        <option value="7">7★</option>
+                        <option value="8">8★</option>
+                        <option value="9">9★</option>
+                        <option value="10">10★</option>
+                    </select>
+                </div>
+
+                <button
+                        type="button"
+                        id="search-button"
+                        class="primary-button search-button"
+                        disabled
+                >
+                    Look for vacancies
+                </button>
+            </div>
+
+            <p
+                    id="finder-status"
+                    class="status-message finder-status"
+                    aria-live="polite"
+            ></p>
+
+            <section
+                    id="perks-section"
+                    class="content-section"
+                    hidden
+            >
+                <div class="subsection-heading">
+                    <div>
+                        <span class="subsection-label">
+                            Company benefits
+                        </span>
+
+                        <h3 id="perks-title">
+                            Company perks
+                        </h3>
+                    </div>
+
+                    <span class="legend">
+                        Faded perks require more stars
+                    </span>
+                </div>
+
+                <div
+                        id="perks-list"
+                        class="card-grid perks-grid"
+                ></div>
+            </section>
+
+            <section
+                    id="results-section"
+                    class="content-section results-section"
+                    hidden
+            >
+                <div class="subsection-heading">
+                    <div>
+                        <span class="subsection-label">
+                            Vacancy results
+                        </span>
+
+                        <h3>Available companies</h3>
+                    </div>
+
+                    <span class="live-badge">
+                        Live API results
+                    </span>
+                </div>
+
+                <p
+                        id="results-status"
+                        class="status-message results-status"
+                        aria-live="polite"
+                ></p>
+
+                <div
+                        id="results-list"
+                        class="card-grid results-grid"
+                ></div>
+            </section>
+        </section>
+
+        <section class="support-panel">
+            <div class="support-icon">
+                ♥
+            </div>
+
+            <div class="support-copy">
+                <span class="support-label">
+                    Support the project
+                </span>
+
+                <h2>
+                    Built by GODLUCK
+                    <span class="player-id">[3863688]</span>
+                </h2>
+
+                <p>
+                    Torn Scouter is free for everyone to use. If it helped
+                    you find a company, in-game support, feedback or simply
+                    sharing the tool with another player is appreciated.
+                </p>
+            </div>
+
+            <a
+                    class="support-button"
+                    href="https://www.torn.com/profiles.php?XID=3863688"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >
+                Visit my Torn profile
+            </a>
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <p>
+            Torn Scouter is an unofficial community project and is not
+            affiliated with Torn or its developers.
+        </p>
+
+        <p>
+            Created by
+            <a
+                    href="https://www.torn.com/profiles.php?XID=3863688"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >
+                GODLUCK [3863688]
+            </a>
+        </p>
+    </footer>
+
+</div>
 
 <script src="js/app.js"></script>
+
 </body>
 </html>
